@@ -1,4 +1,5 @@
 galaxy_info:
+  role_name: managed
   author: Laurent Kling 
   description: Create ssh only user to manage hosts with Ansible
   company: EPFL - STI - IT
