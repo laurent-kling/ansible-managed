@@ -1,0 +1,44 @@
+---
+# tasks file for ansible-managed
+- name: Add user only ssh | Debian based OS
+  user:
+    name: "{{ managed_name }}"
+    groups: sudo,shadow
+    shell: /bin/bash
+    append: yes
+    generate_ssh_key: "{{ managed_generate_local_ssh_key }}"
+    # not need to check, Ansible don't care if ssh_key is not generated !
+    ssh_key_bits: 4096
+    ssh_key_file: .ssh/id_rsa
+  when: ansible_os_family == "Debian"
+
+- name: Add user only ssh | Redhat based OS
+  user:
+    name: "{{ managed_name }}"
+    groups: wheel
+    shell: /bin/bash
+    append: yes
+    generate_ssh_key: "{{ managed_generate_local_ssh_key }}"
+    # not need to check, Ansible don't care if ssh_key is not generated !
+    ssh_key_bits: 4096
+    ssh_key_file: .ssh/id_rsa
+  when: ansible_os_family == "RedHat"
+
+- name: Sudo | add to sudoers file and validate
+  lineinfile:
+    dest: /etc/sudoers
+    state: present
+    regexp: '^{{ managed_name }} '
+#    line: '{{username}} ALL=(ALL) NOPASSWD:ALL'
+    line: "{{ managed_name }} ALL=(ALL) {{ 'NOPASSWD:' if ( managed_default_sudo_nopass|d(true)|bool ) else '' }}ALL"
+    validate: 'visudo -cf %s'
+  environment:
+    PATH: /usr/sbin:/usr/local/sbin:/sbin
+#environment fixes Redhat issue of hard-coded path to visudo
+
+- name: SSH Keys | Add authorized key for ssh key authentication
+  authorized_key:
+    user: "{{ managed_name }}"
+    state: present
+    key: "{{ lookup('file', manager_local_ssh_key_path) }}"
+  when: manager_local_ssh_key_path | default(False)

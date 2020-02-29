@@ -1,0 +1,9 @@
+---
+# defaults file for ansible-managed
+
+manager_local_ssh_key_path: "~/.ssh/id_rsa.pub"
+managed_name: managed
+managed_generate_local_ssh_key: False
+
+#always need to be true because no Password !
+managed_default_sudo_nopass: True

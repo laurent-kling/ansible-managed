@@ -1,0 +1,18 @@
+galaxy_info:
+  author: Laurent Kling 
+  description: Create ssh only user to manage hosts with Ansible
+  company: EPFL - STI - IT
+  license: MIT
+  min_ansible_version: 2.6
+
+  platforms:
+    - name: EL
+      versions:
+        - 7
+    - name: Ubuntu
+      versions:
+        - bionic
+
+  galaxy_tags: [managed, ssh]
+
+dependencies: []
