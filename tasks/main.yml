@@ -56,7 +56,7 @@
 
     - name: Set the correct limited sudoer cmd
       set_fact:
-        managed_sudo_cmd: "{{managed_name}} ALL=NOPASSWD:{{ list_path }}"
+        managed_sudo_cmd: "{{ managed_name }} ALL=NOPASSWD:{{ list_path }}"
   when: limited
 
 #- debug: msg="{{managed_sudo_cmd}}"
