@@ -1,0 +1,8 @@
+---
+- name: Converge
+  hosts: all
+  #with vagrant, need to be elevated !
+  become: true
+
+  roles:
+    - role: ansible-managed

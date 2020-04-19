@@ -5,5 +5,13 @@ manager_local_ssh_key_path: "~/.ssh/id_rsa.pub"
 managed_name: managed
 managed_generate_local_ssh_key: False
 
+# for new option
+limited: False
+# additional variables needed with limited option
+additional_vars:
+ - limited_sudo
+
+# internal variables
+managed_sudo_cmd: ""
 #always need to be true because no Password !
 managed_default_sudo_nopass: True

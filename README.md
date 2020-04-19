@@ -1,9 +1,13 @@
 managed ?
 =========
 
-It is a role to create ssh only user to manage hosts with Ansible.
+It is a role to create SSH user to manage hosts with Ansible or One Time Password SSH with HashiCorp.
 
-The create user account don't have password.
+The created user account doesn't have a password.
+
+By default, the user has the full sudo without need to enter a password.
+
+* **Limited** option specifies what command is allowed.
 
 Requirements
 ------------
@@ -14,7 +18,7 @@ Requirements
 Role Variables
 --------------
 
-By default, these 3 variables are used
+By default, these 3 variables are used:
 
 1. **manager_local_ssh_key_path**: "~/.ssh/id_rsa.pub"
 
@@ -28,19 +32,73 @@ By default, these 3 variables are used
 
    Don't generate local SSH key
 
-Dependencies
-------------
+The additional variables are
 
-Fork of create-user-ansible
+* **limited**: True
+
+  Allow only limited command to be executed with sudo without a password.
+
+
+* **limited_sudo**:  ['reboot','kill']
+
+  List of all command to be executed with sudo without a password
+
+  
 
 Example Playbook
 ----------------
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
+To installing this role from ansible-galaxy
 
-    - hosts: servers
-      roles:
-         - { role: managed, managed_name: ansible }
+```bash
+ansible-galaxy install laurent_kling.managed
+```
+
+Including an example of how to use it with required variables :
+
+```yaml
+---
+- name: create the user "managed" with sudo without password
+  hosts: clients
+  become: true
+
+  roles:
+    - role: laurent_kling.managed
+```
+
+With the **Limited** option to run command "reboot" & "kill" with sudo without a password
+
+```yaml
+---
+- name: create the user "managed" with sudo without a password for reboot & kill only
+  hosts: clients
+  become: true
+
+  roles:
+    - role: laurent_kling.managed
+      limited: True
+      limited_sudo:
+      - "reboot"
+      - "kill"
+```
+
+When used in conjunction with the role `laurent_kling.vault-otp` to setup One Time Password SSH with HashiCorp.
+
+```yaml
+---
+- name: create the user "managed" with full access with OTP SSH with HashiCorp
+  hosts: clients
+  become: true
+
+  roles:
+    - laurent_kling.managed
+    - laurent_kling.vault-otp
+      vault_addr: https://vault:8200
+      ssh_mount_point: ssh
+      vault_ca_cert_file: vault.crt
+```
+
+
 
 License
 -------
@@ -54,8 +112,22 @@ Author Information
 
 ## Version
 
+### V1.0.0
+
+*Released: April 19, 2020*
+
+- Added limited option
+- Correction of the documentation
+
 ### v0.0.1
 
-*Released: Februar 29th 2020*
+*Released: February 29, 2020*
 
 - Initial release
+
+Dependencies
+------------
+
+Fork of create-user-ansible
+
+----------------

@@ -1,7 +1,7 @@
 galaxy_info:
   role_name: managed
   author: Laurent Kling 
-  description: Create ssh only user to manage hosts with Ansible
+  description: Create ssh only user to manage hosts with Ansible or HashiCorp Vault
   company: EPFL - STI - IT
   license: MIT
   min_ansible_version: 2.6
@@ -14,6 +14,6 @@ galaxy_info:
       versions:
         - bionic
 
-  galaxy_tags: [managed, ssh]
+  galaxy_tags: [managed, ssh, otp, hashicorp ]
 
 dependencies: []

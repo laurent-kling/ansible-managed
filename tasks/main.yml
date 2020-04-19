@@ -1,5 +1,11 @@
 ---
 # tasks file for ansible-managed
+## check optional parameters
+- name: 0-Check optional variables
+  fail: msg="Variable '{{ item }}' is not defined"
+  when: (item not in vars) and limited
+  with_items: "{{ additional_vars }}"
+
 - name: Add user only ssh | Debian based OS
   user:
     name: "{{ managed_name }}"
@@ -24,17 +30,48 @@
     ssh_key_file: .ssh/id_rsa
   when: ansible_os_family == "RedHat"
 
-- name: Sudo | add to sudoers file and validate
+
+- name: Set the full sudoer cmd
+  set_fact:
+    managed_sudo_cmd: "{{ managed_name }} ALL=(ALL) {{ 'NOPASSWD:' if ( managed_default_sudo_nopass|d(true)|bool ) else '' }}ALL"
+  when: not limited
+
+- name: Set the limited sudoer cmd
+  block:
+    - name: Get the array of current full path of specified cmd
+      command: "which {{ item }}"
+      register: tmp_list_path
+      with_items: "{{ limited_sudo }}"
+
+    - name: Calculate the resulting array array of specified cmd
+      set_fact:
+        list_path_array: "{{ list_path_array }} + [ '{{ item.stdout }}' ]"
+      with_items: "{{ tmp_list_path.results }}"
+      vars:
+        list_path_array: []
+
+    - name: Calculate the concatanate list of path
+      set_fact:
+        list_path: "{{ list_path_array | join(',') }}"
+
+    - name: Set the correct limited sudoer cmd
+      set_fact:
+        managed_sudo_cmd: "{{managed_name}} ALL=NOPASSWD:{{ list_path }}"
+  when: limited
+
+#- debug: msg="{{managed_sudo_cmd}}"
+
+- name: Add to sudoers file and validate
   lineinfile:
     dest: /etc/sudoers
     state: present
     regexp: '^{{ managed_name }} '
-#    line: '{{username}} ALL=(ALL) NOPASSWD:ALL'
-    line: "{{ managed_name }} ALL=(ALL) {{ 'NOPASSWD:' if ( managed_default_sudo_nopass|d(true)|bool ) else '' }}ALL"
+    line: "{{ managed_sudo_cmd }}"
     validate: 'visudo -cf %s'
   environment:
     PATH: /usr/sbin:/usr/local/sbin:/sbin
-#environment fixes Redhat issue of hard-coded path to visudo
+    #environment fixes Redhat issue of hard-coded path to visudo
+
 
 - name: SSH Keys | Add authorized key for ssh key authentication
   authorized_key:
