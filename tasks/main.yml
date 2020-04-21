@@ -6,29 +6,16 @@
   when: (item not in vars) and limited
   with_items: "{{ additional_vars }}"
 
-- name: Add user only ssh | Debian based OS
+#version 1.0.1 don't add default sudo group by OS
+- name: Add user only ssh
   user:
     name: "{{ managed_name }}"
-    groups: sudo,shadow
     shell: /bin/bash
     append: yes
     generate_ssh_key: "{{ managed_generate_local_ssh_key }}"
     # not need to check, Ansible don't care if ssh_key is not generated !
     ssh_key_bits: 4096
     ssh_key_file: .ssh/id_rsa
-  when: ansible_os_family == "Debian"
-
-- name: Add user only ssh | Redhat based OS
-  user:
-    name: "{{ managed_name }}"
-    groups: wheel
-    shell: /bin/bash
-    append: yes
-    generate_ssh_key: "{{ managed_generate_local_ssh_key }}"
-    # not need to check, Ansible don't care if ssh_key is not generated !
-    ssh_key_bits: 4096
-    ssh_key_file: .ssh/id_rsa
-  when: ansible_os_family == "RedHat"
 
 
 - name: Set the full sudoer cmd

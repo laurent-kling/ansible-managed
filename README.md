@@ -112,7 +112,13 @@ Author Information
 
 ## Version
 
-### V1.0.0
+### v1.0.1
+
+*Released: April 21, 2020*
+
+- Don't add default sudo group by OS
+
+### v1.0.0
 
 *Released: April 19, 2020*
 
